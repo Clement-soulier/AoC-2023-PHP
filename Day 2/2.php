@@ -10,7 +10,7 @@
     $file = "input.txt";
     $content = file_get_contents($file);
     $index_content = 0;
-    $cubes = ["red" => 12, "green" => 13, "blue" => 14];
+    $games = array();
     $color_string = "";
     $game_counter = 0;
     $sum = 0;
@@ -18,7 +18,12 @@
     while ($index_content < strlen($content)) {
         // new game
         if ($content[$index_content] == ":") {
-            $game_counter++;
+            array_push($games, array(
+                "id" => ++$game_counter,
+                "red" => -1,
+                "blue" => -1,
+                "green" => -1
+            ));
             $index_content += 2;
             while ($index_content < strlen($content)) {
                 if ($content[$index_content] == "," || $content[$index_content] == ";" || $content[$index_content] == "\n" || $index_content == strlen($content) - 1) {
@@ -46,16 +51,14 @@
                     } else {
                         $color = substr($color_string, $index_color);
                     }
-                    //verify if the game is possible
-                    if ($number > $cubes[$color]) {
-                        $color_string = "";
-                        break;
+                    //verify if there is enough cubes
+                    if ($number > $games[$game_counter - 1][$color]) {
+                        $games[$game_counter - 1][$color] = $number;
                     }
                     $color_string = "";
                     if ($content[$index_content] == "," || $content[$index_content] == ";") {
                         $index_content += 2;
                     } else {
-                        $sum += $game_counter;
                         break;
                     }
                 }
@@ -65,6 +68,11 @@
         }
         $index_content++;
     }
+
+    for ($i = 0; $i < count($games); $i++) {
+        $sum += $games[$i]["red"] * $games[$i]["green"] * $games[$i]["blue"];
+    }
+
     echo $sum;
     ?>
 </body>
